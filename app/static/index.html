@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#09131d" />
+  <title>Active Map Beta</title>
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  />
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <main id="app">
+    <section id="auth-view" class="auth-shell">
+      <div class="auth-ambient auth-ambient-one"></div>
+      <div class="auth-ambient auth-ambient-two"></div>
+
+      <div class="auth-card">
+        <div class="brand-lockup">
+          <div class="brand-mark" aria-hidden="true">AM</div>
+          <div>
+            <span class="eyebrow">Твоя активная карта</span>
+            <h1>Active Map</h1>
+          </div>
+        </div>
+        <p class="auth-lead">Залы, велодорожки и друзья на одной живой карте.</p>
+
+        <div class="tabs" role="tablist" aria-label="Авторизация">
+          <button id="show-login" class="tab active" type="button" role="tab" aria-selected="true">Вход</button>
+          <button id="show-register" class="tab" type="button" role="tab" aria-selected="false">Регистрация</button>
+        </div>
+
+        <form id="login-form" class="auth-form">
+          <label>
+            <span>Email</span>
+            <input name="email" type="email" autocomplete="email" placeholder="name@example.com" required />
+          </label>
+          <label>
+            <span>Пароль</span>
+            <input name="password" type="password" autocomplete="current-password" placeholder="Не менее 8 символов" required />
+          </label>
+          <button class="primary-button" type="submit">Войти</button>
+        </form>
+
+        <form id="register-form" class="auth-form" hidden>
+          <label>
+            <span>Имя</span>
+            <input name="name" minlength="2" maxlength="60" autocomplete="name" placeholder="Как вас показывать друзьям" required />
+          </label>
+          <label>
+            <span>Email</span>
+            <input name="email" type="email" autocomplete="email" placeholder="name@example.com" required />
+          </label>
+          <label>
+            <span>Пароль</span>
+            <input name="password" type="password" minlength="8" autocomplete="new-password" placeholder="Не менее 8 символов" required />
+          </label>
+          <button class="primary-button" type="submit">Создать аккаунт</button>
+        </form>
+
+        <div id="auth-error" class="error" role="alert"></div>
+        <p class="auth-note">Геолокация включается только после входа и вашего разрешения.</p>
+      </div>
+    </section>
+
+    <section id="map-view" class="map-shell" hidden>
+      <div class="map-surface">
+        <div id="map" aria-label="Интерактивная карта"></div>
+        <div class="map-vignette" aria-hidden="true"></div>
+      </div>
+
+      <header class="map-header">
+        <div class="map-title-wrap">
+          <span class="map-kicker">ACTIVE MAP</span>
+          <h1 class="map-title">земля</h1>
+          <div class="map-title-line"></div>
+        </div>
+        <button id="profile-chip" class="profile-chip" type="button" aria-label="Открыть профиль">
+          <span id="profile-initial">Я</span>
+        </button>
+      </header>
+
+      <button id="activity-chip" class="activity-chip" type="button">
+        <span class="activity-icon" aria-hidden="true">◒</span>
+        <span id="activity-text">друзья на карте</span>
+      </button>
+
+      <div class="floating-actions" aria-label="Действия карты">
+        <button id="layers-button" class="round-action" type="button" aria-label="Слои карты">
+          <span aria-hidden="true">◈</span>
+        </button>
+        <button id="locate-button" class="round-action" type="button" aria-label="Моё местоположение">
+          <span aria-hidden="true">⌖</span>
+        </button>
+      </div>
+
+      <button id="world-button" class="world-button" type="button">
+        <span aria-hidden="true">●</span>
+        <span>мой мир</span>
+      </button>
+
+      <nav class="bottom-nav" aria-label="Навигация приложения">
+        <button class="nav-item active" type="button" data-panel="map">
+          <span class="nav-icon" aria-hidden="true">●</span>
+          <span>карта</span>
+        </button>
+        <button class="nav-item" type="button" data-panel="friends">
+          <span class="nav-icon" aria-hidden="true">♟</span>
+          <span>друзья</span>
+        </button>
+        <button class="nav-item" type="button" data-panel="layers">
+          <span class="nav-icon" aria-hidden="true">◎</span>
+          <span>слои</span>
+        </button>
+        <button class="nav-item" type="button" data-panel="profile">
+          <span id="nav-profile-initial" class="nav-avatar" aria-hidden="true">Я</span>
+          <span>ты</span>
+        </button>
+      </nav>
+
+      <aside id="app-drawer" class="app-drawer" aria-hidden="true">
+        <div class="drawer-grabber" aria-hidden="true"></div>
+        <div class="drawer-header">
+          <div>
+            <span id="drawer-kicker" class="eyebrow">Панель</span>
+            <h2 id="drawer-title">Настройки</h2>
+          </div>
+          <button id="drawer-close" class="icon-button" type="button" aria-label="Закрыть">×</button>
+        </div>
+
+        <section id="panel-friends" class="drawer-panel" hidden>
+          <form id="friend-form" class="friend-form">
+            <input name="email" type="email" placeholder="Email друга" required />
+            <button type="submit">Добавить</button>
+          </form>
+          <div id="friend-message" class="message"></div>
+          <div id="friends-list" class="friends-list"></div>
+        </section>
+
+        <section id="panel-layers" class="drawer-panel" hidden>
+          <label class="setting-row">
+            <span><strong>Залы</strong><small>Фитнес- и спортивные центры</small></span>
+            <input id="layer-gyms" type="checkbox" checked />
+          </label>
+          <label class="setting-row">
+            <span><strong>Велодорожки</strong><small>Маршруты и велоинфраструктура</small></span>
+            <input id="layer-cycle" type="checkbox" checked />
+          </label>
+          <label class="setting-row">
+            <span><strong>Друзья</strong><small>Точки подтверждённых друзей</small></span>
+            <input id="layer-friends" type="checkbox" checked />
+          </label>
+          <p class="drawer-hint">Спортивные объекты загружаются при приближении карты.</p>
+        </section>
+
+        <section id="panel-profile" class="drawer-panel" hidden>
+          <div class="profile-card">
+            <div id="profile-avatar-large" class="profile-avatar-large">Я</div>
+            <div>
+              <strong id="user-name">Пользователь</strong>
+              <small id="user-email"></small>
+            </div>
+          </div>
+
+          <button id="start-tracking" class="primary-button" type="button">Включить мою геолокацию</button>
+          <label class="setting-row compact">
+            <span><strong>Показывать меня друзьям</strong><small id="tracking-status">Геолокация выключена</small></span>
+            <input id="share-location" type="checkbox" checked />
+          </label>
+          <button id="logout" class="danger-button" type="button">Выйти из аккаунта</button>
+        </section>
+      </aside>
+
+      <div id="drawer-backdrop" class="drawer-backdrop" hidden></div>
+      <div id="toast" class="toast" hidden></div>
+    </section>
+  </main>
+
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
+  ></script>
+  <script src="/static/app.js" defer></script>
+</body>
+</html>

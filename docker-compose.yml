@@ -1,0 +1,12 @@
+services:
+  active-map:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      JWT_SECRET: "CHANGE_THIS_TO_A_LONG_RANDOM_VALUE"
+      COOKIE_SECURE: "false"
+      DATA_DIR: "/app/data"
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
